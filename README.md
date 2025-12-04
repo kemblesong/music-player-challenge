@@ -75,6 +75,7 @@ Build a music player with the following features:
 - All songs **after** the selected song should populate the queue
 - Display the current song prominently (album art, title, artist)
 - Show the queue of upcoming songs
+- NOTE: we're not actually streaming any audio in this exercise!
 
 **Example:** If the playlist has songs [A, B, C, D, E] and the user clicks on C:
 - Now playing: C
@@ -108,8 +109,6 @@ Implement any of these features if you have time:
 ---
 
 ## Part 2: Scrolling Music Library (~40 mins)
-
-If you finish Part 1, try this performance challenge:
 
 - Fetch all 10,000 songs from `/api/songs`
 - Display them in a scrollable list sorted A-Z
