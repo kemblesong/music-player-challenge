@@ -2,7 +2,7 @@
 
 Build a music player application similar to Spotify. This challenge tests your ability to work with data structures, manage application state, and build intuitive user interfaces.
 
-**Time Limit:** 1-1.5 hours
+**Time Limit:** 1.5 hours
 
 ## Getting Started
 
@@ -54,11 +54,11 @@ interface Song {
 
 ### `GET /api/songs`
 
-Returns all 10,000 songs sorted A-Z by title. Used for Part 2 (Bonus).
+Returns all 10,000 songs sorted A-Z by title. Used for Part 2.
 
 ---
 
-## Part 1: Core Music Player
+## Part 1: Core Music Player (~40 mins)
 
 Build a music player with the following features:
 
@@ -107,7 +107,7 @@ Implement any of these features if you have time:
 
 ---
 
-## Part 2: Virtual Scrolling (Bonus)
+## Part 2: Scrolling Music Library (~40 mins)
 
 If you finish Part 1, try this performance challenge:
 
@@ -118,6 +118,24 @@ If you finish Part 1, try this performance challenge:
 - Clicking on the scrollbar should jump to that position
 
 **Why virtual scrolling?** Rendering 10,000 DOM elements would freeze the browser. Only render what's visible!
+
+---
+
+## Bonus: Integrated Music Player (~20 mins)
+
+If you've completed both Part 1 and Part 2, integrate them together:
+
+- Allow users to play songs directly from the full 10,000-song library
+- When a song is clicked in the library, it becomes the "now playing" song
+- All songs **after** the selected song in the sorted list should populate the queue
+- Maintain all Part 1 functionality (play next, shuffle, queue management) with the full library
+- Consider adding search/filter functionality to help users find songs in the large library
+
+**Example:** If a user searches for "Beatles" and clicks on "Hey Jude" (which appears at position 4,523 in the sorted list):
+- Now playing: "Hey Jude"
+- Queue: All songs from position 4,524 onwards (approximately 5,477 songs)
+
+This bonus challenge tests your ability to refactor for reuse, combine multiple features, and handle edge cases with large datasets.
 
 ---
 
