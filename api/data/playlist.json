@@ -1,0 +1,166 @@
+{
+  "id": "1",
+  "name": "Discover Weekly",
+  "songs": [
+    {
+      "id": "song-001",
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "album": "After Hours",
+      "albumArt": "https://picsum.photos/seed/song001/300/300",
+      "duration": 201
+    },
+    {
+      "id": "song-002",
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "album": "A Night at the Opera",
+      "albumArt": "https://picsum.photos/seed/song002/300/300",
+      "duration": 354
+    },
+    {
+      "id": "song-003",
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "album": "Thriller",
+      "albumArt": "https://picsum.photos/seed/song003/300/300",
+      "duration": 294
+    },
+    {
+      "id": "song-004",
+      "title": "Hotel California",
+      "artist": "Eagles",
+      "album": "Hotel California",
+      "albumArt": "https://picsum.photos/seed/song004/300/300",
+      "duration": 391
+    },
+    {
+      "id": "song-005",
+      "title": "Smells Like Teen Spirit",
+      "artist": "Nirvana",
+      "album": "Nevermind",
+      "albumArt": "https://picsum.photos/seed/song005/300/300",
+      "duration": 301
+    },
+    {
+      "id": "song-006",
+      "title": "Sweet Child O' Mine",
+      "artist": "Guns N' Roses",
+      "album": "Appetite for Destruction",
+      "albumArt": "https://picsum.photos/seed/song006/300/300",
+      "duration": 356
+    },
+    {
+      "id": "song-007",
+      "title": "Stairway to Heaven",
+      "artist": "Led Zeppelin",
+      "album": "Led Zeppelin IV",
+      "albumArt": "https://picsum.photos/seed/song007/300/300",
+      "duration": 482
+    },
+    {
+      "id": "song-008",
+      "title": "Imagine",
+      "artist": "John Lennon",
+      "album": "Imagine",
+      "albumArt": "https://picsum.photos/seed/song008/300/300",
+      "duration": 187
+    },
+    {
+      "id": "song-009",
+      "title": "Like a Rolling Stone",
+      "artist": "Bob Dylan",
+      "album": "Highway 61 Revisited",
+      "albumArt": "https://picsum.photos/seed/song009/300/300",
+      "duration": 369
+    },
+    {
+      "id": "song-010",
+      "title": "Hey Jude",
+      "artist": "The Beatles",
+      "album": "Hey Jude",
+      "albumArt": "https://picsum.photos/seed/song010/300/300",
+      "duration": 431
+    },
+    {
+      "id": "song-011",
+      "title": "Purple Haze",
+      "artist": "Jimi Hendrix",
+      "album": "Are You Experienced",
+      "albumArt": "https://picsum.photos/seed/song011/300/300",
+      "duration": 171
+    },
+    {
+      "id": "song-012",
+      "title": "Superstition",
+      "artist": "Stevie Wonder",
+      "album": "Talking Book",
+      "albumArt": "https://picsum.photos/seed/song012/300/300",
+      "duration": 245
+    },
+    {
+      "id": "song-013",
+      "title": "Respect",
+      "artist": "Aretha Franklin",
+      "album": "I Never Loved a Man",
+      "albumArt": "https://picsum.photos/seed/song013/300/300",
+      "duration": 147
+    },
+    {
+      "id": "song-014",
+      "title": "What's Going On",
+      "artist": "Marvin Gaye",
+      "album": "What's Going On",
+      "albumArt": "https://picsum.photos/seed/song014/300/300",
+      "duration": 233
+    },
+    {
+      "id": "song-015",
+      "title": "Born to Run",
+      "artist": "Bruce Springsteen",
+      "album": "Born to Run",
+      "albumArt": "https://picsum.photos/seed/song015/300/300",
+      "duration": 270
+    },
+    {
+      "id": "song-016",
+      "title": "London Calling",
+      "artist": "The Clash",
+      "album": "London Calling",
+      "albumArt": "https://picsum.photos/seed/song016/300/300",
+      "duration": 199
+    },
+    {
+      "id": "song-017",
+      "title": "Good Vibrations",
+      "artist": "The Beach Boys",
+      "album": "Smiley Smile",
+      "albumArt": "https://picsum.photos/seed/song017/300/300",
+      "duration": 219
+    },
+    {
+      "id": "song-018",
+      "title": "Johnny B. Goode",
+      "artist": "Chuck Berry",
+      "album": "Chuck Berry Is on Top",
+      "albumArt": "https://picsum.photos/seed/song018/300/300",
+      "duration": 161
+    },
+    {
+      "id": "song-019",
+      "title": "I Want to Hold Your Hand",
+      "artist": "The Beatles",
+      "album": "Meet the Beatles!",
+      "albumArt": "https://picsum.photos/seed/song019/300/300",
+      "duration": 146
+    },
+    {
+      "id": "song-020",
+      "title": "Comfortably Numb",
+      "artist": "Pink Floyd",
+      "album": "The Wall",
+      "albumArt": "https://picsum.photos/seed/song020/300/300",
+      "duration": 382
+    }
+  ]
+}
