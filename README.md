@@ -108,7 +108,9 @@ Implement any of these features if you have time:
 
 ---
 
-## Part 2: Scrolling Music Library (~40 mins)
+## Part 2: Scrolling Song Library (~40 mins)
+
+Build an interface for browsing a large song library with the following features:
 
 - Fetch all 10,000 songs from `/api/songs`
 - Display them in a scrollable list sorted A-Z
