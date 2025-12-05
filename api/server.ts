@@ -23,8 +23,18 @@ app.use('/*', cors())
 // Simulate network latency (300ms)
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// GET /api/playlists/:id - Returns a playlist with its songs
-app.get('/api/playlists/:id', async (c) => {
+app.get('/', async (c) => {
+  return c.text(`
+🎵 Music Player API
+Endpoints:
+GET /playlists/1
+GET /songs
+GET /songs/:id
+`)
+})
+
+// GET /playlists/:id - Returns a playlist with its songs
+app.get('/playlists/:id', async (c) => {
   await delay(300)
 
   const id = c.req.param('id')
@@ -36,14 +46,14 @@ app.get('/api/playlists/:id', async (c) => {
   return c.json({ error: 'Playlist not found' }, 404)
 })
 
-// GET /api/songs - Returns all 10,000 songs (for Part 2: Virtual Scrolling)
-app.get('/api/songs', async (c) => {
+// GET /songs - Returns all 10,000 songs (for Part 2: Virtual Scrolling)
+app.get('/songs', async (c) => {
   await delay(300)
   return c.json(allSongs)
 })
 
-// GET /api/songs/:id - Returns a single song
-app.get('/api/songs/:id', async (c) => {
+// GET /songs/:id - Returns a single song
+app.get('/songs/:id', async (c) => {
   await delay(100)
 
   const id = c.req.param('id')
@@ -59,9 +69,9 @@ app.get('/api/songs/:id', async (c) => {
 const port = 3001
 console.log(`🎵 Music Player API running at http://localhost:${port}`)
 console.log(`\nEndpoints:`)
-console.log(`  GET /api/playlists/1  - Playlist with 20 songs`)
-console.log(`  GET /api/songs        - All 10,000 songs (sorted A-Z)`)
-console.log(`  GET /api/songs/:id    - Single song by ID`)
+console.log(`  GET /playlists/1  - Playlist with 20 songs`)
+console.log(`  GET /songs        - All 10,000 songs (sorted A-Z)`)
+console.log(`  GET /songs/:id    - Single song by ID`)
 
 serve({
   fetch: app.fetch,
