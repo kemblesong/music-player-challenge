@@ -230,7 +230,7 @@ export interface Playlist {
 
 ## Project Structure
 
-This project uses pnpm workspaces with three packages:
+This project uses pnpm workspaces and vite:
 
 ```
 ├── app/                    # Frontend application (start here!)
@@ -250,7 +250,6 @@ This project uses pnpm workspaces with three packages:
 │   └── data/
 │       ├── playlist.json   # 20 songs for Part 1
 │       └── songs-10000.json # 10,000 songs for Part 2
-├── solution/               # Reference solution
 ├── package.json            # Workspace root
 ├── pnpm-workspace.yaml     # Workspace configuration
 └── README.md               # This file
