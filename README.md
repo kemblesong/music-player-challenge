@@ -4,6 +4,8 @@ Build a music player application similar to Spotify. This challenge tests your a
 
 **Time Limit:** 1.5 hours
 
+<img width="1564" height="1084" alt="image" src="https://github.com/user-attachments/assets/9e02dfad-a4ef-44ca-9a9c-11c48ac5e517" />
+
 ## Getting Started
 
 You'll need **two terminal windows** to run this project.
