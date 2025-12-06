@@ -13,6 +13,7 @@ interface UseVirtualScrollReturn {
   totalHeight: number
   onScroll: (event: React.UIEvent<HTMLDivElement>) => void
   scrollContainerRef: React.RefObject<HTMLDivElement | null>
+  scrollToIndex: (index: number) => void
 }
 
 export function useVirtualScroll({
@@ -99,6 +100,16 @@ export function useVirtualScroll({
     setScrollTop(event.currentTarget.scrollTop)
   }, [])
 
+  // Scroll to a specific index
+  const scrollToIndex = useCallback((index: number) => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const targetScrollTop = index * itemHeight
+    container.scrollTop = targetScrollTop
+    setScrollTop(targetScrollTop)
+  }, [itemHeight])
+
   return {
     startIndex,
     endIndex,
@@ -106,5 +117,6 @@ export function useVirtualScroll({
     totalHeight,
     onScroll,
     scrollContainerRef,
+    scrollToIndex,
   }
 }

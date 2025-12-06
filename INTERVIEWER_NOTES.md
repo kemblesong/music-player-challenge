@@ -71,9 +71,145 @@ A well-structured solution should maintain these key state variables:
 - Doesn't preserve original order (can't un-shuffle)
 - Shuffles the currently playing song
 
+## Part 2: Song Library Implementation
+
+Part 2 tests performance optimization, DOM manipulation, and handling large datasets. Tasks are listed in order of increasing difficulty.
+
+### Task 1: Fetch & Display Songs (Easy)
+
+**What to look for:** Standard data fetching with loading/error states. Most candidates should complete this quickly.
+
+**Implementation approach:**
+- Fetch 10K songs from `/api/songs`
+- Display in a scrollable list
+- Performance becomes an issue here — naive rendering will lag
+
+**Strong signals:**
+- Recognizes performance problem without prompting
+- Implements virtual scrolling or pagination
+- Proper loading/error states
+
+**Red flags:**
+- Renders all 10K items in DOM without noticing lag
+- No loading state while fetching
+
+### Task 2: Search (Easy-Medium)
+
+**What to look for:** Filtering logic with performance considerations.
+
+**Implementation approach:**
+```typescript
+const filteredSongs = useMemo(() =>
+  songs.filter(song =>
+    song.title.toLowerCase().includes(query.toLowerCase()) ||
+    song.artist.toLowerCase().includes(query.toLowerCase())
+  ),
+  [songs, query]
+)
+```
+
+**Strong signals:**
+- Uses `useMemo` to avoid re-filtering on every render
+- Debounces search input to avoid filtering on every keystroke
+- Case-insensitive matching
+
+**Red flags:**
+- Filters on every render without memoization
+- No debouncing — UI freezes while typing
+- Case-sensitive search (misses obvious matches)
+
+### Task 3: Alphabetical Jump (Medium)
+
+**What to look for:** Building an index map and programmatic scrolling.
+
+**Implementation approach:**
+```typescript
+// Build index map
+const letterIndexMap = useMemo(() => {
+  const map = new Map<string, number>()
+  songs.forEach((song, index) => {
+    const letter = song.title.charAt(0).toUpperCase()
+    if (!map.has(letter)) map.set(letter, index)
+  })
+  return map
+}, [songs])
+
+// Scroll to letter
+const scrollToLetter = (letter: string) => {
+  const index = letterIndexMap.get(letter)
+  if (index !== undefined) {
+    scrollContainerRef.current.scrollTop = index * ITEM_HEIGHT
+  }
+}
+```
+
+**Strong signals:**
+- Builds index map efficiently (single pass)
+- Correctly calculates scroll position based on item height
+- Disables letters with no matching songs
+
+**Red flags:**
+- Searches entire array on each letter click (O(n) per click)
+- Doesn't account for virtual scrolling offset
+- No visual feedback for unavailable letters
+
+### Task 4: Group by Artist/Album (Hard)
+
+**What to look for:** This is significantly harder because grouping changes the data structure. With virtual scrolling, candidates must handle a mixed list of headers and songs.
+
+**Implementation approach:**
+```typescript
+type ListItem =
+  | { type: 'header'; label: string }
+  | { type: 'song'; song: Song }
+
+const listItems = useMemo((): ListItem[] => {
+  if (groupBy === 'none') {
+    return songs.map(song => ({ type: 'song', song }))
+  }
+
+  const grouped = new Map<string, Song[]>()
+  for (const song of songs) {
+    const key = groupBy === 'artist' ? song.artist : song.album
+    if (!grouped.has(key)) grouped.set(key, [])
+    grouped.get(key)!.push(song)
+  }
+
+  const items: ListItem[] = []
+  for (const [label, groupSongs] of grouped) {
+    items.push({ type: 'header', label })
+    groupSongs.forEach(song => items.push({ type: 'song', song }))
+  }
+  return items
+}, [songs, groupBy])
+```
+
+**Strong signals:**
+- Flattens groups into a single list for virtual scrolling
+- Headers and songs have consistent height (or variable height handling)
+- Maintains correct play queue (extracts only songs, not headers)
+- Considers interaction with alphabetical jump (disables or adapts)
+
+**Red flags:**
+- Breaks virtual scrolling when grouping is enabled
+- Headers don't scroll correctly with content
+- Play queue includes header items
+- Doesn't sort groups alphabetically
+
+### Task Difficulty Summary
+
+| Task | Difficulty | Time Estimate | Notes |
+|------|------------|---------------|-------|
+| Task 1: Fetch & Display | Easy | 10-15 min | Standard pattern, performance awareness key |
+| Task 2: Search | Easy-Medium | 8-12 min | Debouncing + memoization |
+| Task 3: Alphabetical Jump | Medium | 10-15 min | Index building + scroll calculation |
+| Task 4: Group by Artist/Album | Hard | 15-20 min | Consider making optional |
+
+**Recommendation:** Tasks 1-3 are required (~30-40 min). Task 4 can be offered as a bonus for candidates who finish early.
+
 ## Virtual Scrolling Implementation
 
-The virtual scrolling challenge (Part 2) tests understanding of performance optimization and DOM manipulation.
+Virtual scrolling (used in Task 1) tests understanding of performance optimization and DOM manipulation.
 
 ### Key Formula
 
@@ -220,6 +356,8 @@ The project is set up with Tailwind CSS, but candidates are not expected to use 
 
 ## Time Expectations
 
+### Part 1: Core Music Player
+
 | Task | Expected Time | Notes |
 |------|---------------|-------|
 | Task 1 (Fetch/Display) | 8-10 min | Basic React setup, API call, loading/error states |
@@ -227,10 +365,21 @@ The project is set up with Tailwind CSS, but candidates are not expected to use 
 | Task 3 (Play Next) | 5-7 min | Queue manipulation, UI action (button/menu) |
 | Task 4 (Shuffle) | 10-12 min | Algorithm implementation, toggle logic, state preservation |
 | Task 5 (Additional) | 5-8 min | Pick 1-2 features from the list (optional if time is tight) |
-| Part 2 (Virtual Scroll) | 35-40 min | Required: Performance optimization, virtual scrolling implementation |
 
-**Total for Part 1:** ~40-52 minutes  
-**Total with Part 2:** ~75-92 minutes
+**Part 1 Total:** ~40-52 minutes
+
+### Part 2: Song Library
+
+| Task | Expected Time | Notes |
+|------|---------------|-------|
+| Task 1 (Fetch/Display) | 10-15 min | Performance awareness is key — should recognize need for optimization |
+| Task 2 (Search) | 8-12 min | Debouncing + memoization |
+| Task 3 (Alphabetical Jump) | 10-15 min | Index building + scroll calculation |
+| Task 4 (Group by Artist/Album) | 15-20 min | Hard — consider making optional/bonus |
+
+**Part 2 Total:** ~35-50 minutes (Tasks 1-3 required, Task 4 optional)
+
+**Combined Total:** ~75-100 minutes
 
 ## Discussion Questions
 

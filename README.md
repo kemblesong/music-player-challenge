@@ -124,17 +124,30 @@ Implement any of these features if you have time:
 
 ---
 
-## Part 2: Scrolling Song Library (~40 mins)
+## Part 2: Song Library (~40 mins)
 
-Build an interface for browsing a large song library with the following features:
+Build an interface for browsing a large song library.
+
+### Task 1: Fetch & Display Songs
 
 - Fetch all 10,000 songs from `/api/songs`
 - Display them in a scrollable list sorted A-Z
-- **Only render the visible items** (virtual scrolling)
-- The scrollbar should represent the full list height
-- Clicking on the scrollbar should jump to that position
+- Your solution should remain responsive with the full dataset
 
-**Why virtual scrolling?** Rendering 10,000 DOM elements would freeze the browser. Only render what's visible!
+### Task 2: Search
+
+- Add a search input to filter songs by title or artist
+- Results should update as the user types
+
+### Task 3: Alphabetical Jump
+
+- Display an A-Z navigation (e.g., clickable letters)
+- Clicking a letter scrolls to songs starting with that letter
+
+### Task 4: Group by Artist or Album
+
+- Add the ability to toggle grouping by artist or album
+- Display section headers for each group
 
 ---
 
@@ -181,16 +194,6 @@ function shuffle<T>(array: T[]): T[] {
   }
   return result
 }
-```
-
-### Virtual Scrolling Formula
-
-```typescript
-const startIndex = Math.floor(scrollTop / itemHeight)
-const endIndex = Math.min(
-  startIndex + Math.ceil(containerHeight / itemHeight) + 1,
-  totalItems - 1
-)
 ```
 
 ---
