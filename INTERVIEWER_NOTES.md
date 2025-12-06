@@ -2,6 +2,32 @@
 
 This document outlines how to evaluate candidate solutions, what an ideal implementation looks like, and specific signals to watch for during the interview. Because the project is large, make it clear to the candidate that they are not expected to cover everything in detail. Instead, once the core requirements are met, ask them to choose 2 or 3 areas to pay extra attention to (for example, accessibility and styling, or component structure and state management). For areas they don't dive into, encourage them to briefly describe what their "ideal" approach would be, to demonstrate their broader understanding.
 
+## Suggested Discussion Guide
+
+Use this as a rough guide for pacing the interview:
+
+### Before Coding (5 mins)
+- Introduce yourself and set expectations
+- Let them know they can look up APIs/documentation as needed
+- Explain they should ask questions if anything is unclear
+- Mention hints are provided in the README and can be used directly
+
+### During Coding (~80 mins)
+- Let the candidate work independently, but stay available for questions
+- If they get stuck, offer gentle nudges before revealing hints
+- Note their debugging approach and how they handle obstacles
+- Observe how they break down problems and manage their time
+
+### Code Review & Discussion (5 mins)
+- Ask them to walk through their implementation choices
+- Discuss trade-offs they considered
+- Ask about areas they'd improve given more time
+- Use the discussion questions below to probe deeper understanding
+
+### Wrap Up (5 mins)
+- Answer any questions they have about the role or team
+- Explain next steps in the process
+
 ## Ideal State Structure
 
 A well-structured solution should maintain these key state variables:
@@ -32,18 +58,16 @@ A well-structured solution should maintain these key state variables:
 
 ### Task 4 (Shuffle)
 
-**What to look for:** 
+**What to look for:**
 - Preserves `originalQueue` before shuffling
 - Restores original order when toggle is disabled
-- Uses a reasonable shuffling strategy, like the hinted Fisher-Yates shuffle algorithm (O(n), unbiased)
+- Implements shuffling (the Fisher-Yates algorithm is provided in the hints)
 
 **Strong signals:**
 - Saves original queue before first shuffle
-- Implements shuffling correctly
 - Handles toggle on/off cleanly
 
 **Red flags:**
-- Uses `array.sort(() => Math.random() - 0.5)` (biased shuffle)
 - Doesn't preserve original order (can't un-shuffle)
 - Shuffles the currently playing song
 
@@ -122,16 +146,16 @@ The challenge tests React fundamentals: hooks usage, component composition, and 
 
 ## Styling Signals
 
-The challenge uses Tailwind CSS. Look for proper layout patterns, accessibility, and virtual scroll CSS implementation.
+The project is set up with Tailwind CSS, but candidates are not expected to use Tailwind. They may use CSS modules, plain CSS, styled-components, or any other styling approach they're comfortable with. Look for proper layout patterns, accessibility, and virtual scroll CSS implementation regardless of the styling method chosen.
 
 ### Layout Patterns
 
 **Scrollable Containers:**
-- **Strong signal:** Uses `overflow-y-auto` with fixed or calculated height for scrollable lists
+- **Strong signal:** Uses `overflow-y: auto` (or Tailwind's `overflow-y-auto`) with fixed or calculated height for scrollable lists
 - **Red flag:** Missing overflow, content overflows viewport, scroll doesn't work
 
 **List Layout:**
-- **Strong signal:** Uses `flex flex-col` or `space-y-*` utilities for consistent song list spacing
+- **Strong signal:** Uses flexbox with column direction and consistent spacing for song lists
 - **Red flag:** Inconsistent spacing, manual margins, layout breaks on different screen sizes
 
 **Now Playing Section:**
@@ -145,17 +169,17 @@ The challenge uses Tailwind CSS. Look for proper layout patterns, accessibility,
 - **Red flag:** Uses `margin-top` on inner container (causes scroll jump issues)
 
 **Container Heights:**
-- **Strong signal:** Sets explicit container height (`h-[600px]` or calculated) for correct scrollbar behavior
+- **Strong signal:** Sets explicit container height (e.g., `height: 600px` or calculated value) for correct scrollbar behavior
 - **Red flag:** Missing height, scrollbar doesn't match content height
 
 ### Accessibility & UX
 
 **Interactive Elements:**
-- **Strong signal:** Visible focus states (`focus:ring-2`), hover states (`hover:bg-gray-800`), cursor pointer (`cursor-pointer`)
+- **Strong signal:** Visible focus states, hover states, and cursor changes on interactive elements
 - **Red flag:** No visual feedback on click/hover, can't tell what's clickable, poor keyboard navigation
 
 **Text Handling:**
-- **Strong signal:** Truncates long text with `text-ellipsis overflow-hidden truncate`, maintains layout integrity
+- **Strong signal:** Truncates long text with `text-overflow: ellipsis` and `overflow: hidden`, maintains layout integrity
 - **Red flag:** Text breaks layout, no truncation for long song titles/artists
 
 ## Green Flags (Strong Signals)
@@ -170,8 +194,8 @@ The challenge uses Tailwind CSS. Look for proper layout patterns, accessibility,
 | **React Performance** | Uses `React.memo` for list items, stable keys (IDs not indices), extracts custom hooks |
 | **TypeScript** | Properly types state, event handlers, and function parameters |
 | **Virtual Scroll** | Understands why DOM node count matters for performance |
-| **Styling** | Proper Tailwind layout (`overflow-y-auto`, `space-y-*`), uses `transform` for virtual scroll positioning |
-| **Accessibility** | Visible focus states, hover feedback, cursor pointer, text truncation |
+| **Styling** | Proper CSS layout (scrollable containers, flexbox), uses `transform` for virtual scroll positioning |
+| **Accessibility** | Visible focus states, hover feedback, cursor changes, text truncation |
 | **Error Handling** | Shows loading states, handles API errors, provides user feedback |
 | **Code Organization** | Logical file structure, reusable functions, clear naming |
 
@@ -180,7 +204,7 @@ The challenge uses Tailwind CSS. Look for proper layout patterns, accessibility,
 | Area | Signal |
 |------|--------|
 | **State Mutations** | Mutates arrays with `.push()`, `.splice()`, `.pop()` directly on state |
-| **Shuffle Algorithm** | Uses `array.sort(() => Math.random() - 0.5)` (biased shuffle) |
+| **Shuffle Logic** | Shuffles the currently playing song |
 | **Shuffle Logic** | Doesn't preserve original order (can't un-shuffle) |
 | **React Hooks** | Missing `useEffect` dependencies, infinite loops, no cleanup functions, stale closures |
 | **React Keys** | Uses array indices as keys in virtual scroll (causes flicker/bugs) |
@@ -188,7 +212,7 @@ The challenge uses Tailwind CSS. Look for proper layout patterns, accessibility,
 | **Virtual Scroll** | Renders all 10K items instead of only visible ones |
 | **Virtual Scroll** | Wrong height calculation (scrollbar doesn't match content) |
 | **Virtual Scroll CSS** | Uses `margin-top` for positioning (causes scroll jumps), missing container height |
-| **Styling** | Missing `overflow-y-auto`, no hover/focus states, text breaks layout, no truncation |
+| **Styling** | Missing overflow handling, no hover/focus states, text breaks layout, no truncation |
 | **Error Handling** | No loading states, silent failures, unhandled promise rejections |
 | **Type Safety** | Uses `any` types, missing type annotations, ignores TypeScript errors |
 | **Queue Logic** | Incorrect queue population (includes current song or wrong slice) |
@@ -241,4 +265,3 @@ Use these questions to probe deeper understanding:
 | **Good** | Completes Part 1 tasks (1-4) and Part 2, minor issues with shuffle or edge cases, readable code |
 | **Satisfactory** | Completes basic Part 1 functionality (1-2) and attempts Part 2, some bugs or missing edge cases, works but messy |
 | **Needs Work** | Struggles with state management, incorrect queue logic, doesn't complete core features or Part 2 |
-

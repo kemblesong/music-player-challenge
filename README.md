@@ -158,6 +158,8 @@ This bonus challenge tests your ability to refactor for reuse, combine multiple 
 
 ## Hints
 
+These hints are provided as helpers—you're not expected to know these algorithms by heart. Feel free to use these snippets directly, look up documentation, or use any approach you're comfortable with.
+
 ### Formatting Duration
 
 ```typescript
