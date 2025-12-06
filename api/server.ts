@@ -25,26 +25,21 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 app.get("/", async (c) => {
   return c.text(`
-  ╔═══════════════════════════════════════════════════╗
-  ║                                                   ║
-  ║        ♪ ♫  MUSIC PLAYER CHALLENGE  ♫ ♪           ║
-  ║                                                   ║
-  ║              ┌───────────────┐                    ║
-  ║              │    ►  ▌▌  ■   │                    ║
-  ║              │    ◄◄    ►►   │                    ║
-  ║              └───────────────┘                    ║
-  ║                   API v1.0                        ║
-  ║                                                   ║
-  ╠═══════════════════════════════════════════════════╣
-  ║                                                   ║
-  ║   ENDPOINTS                                       ║
-  ║   ─────────                                       ║
-  ║                                                   ║
-  ║   GET /playlists/1    Fetch playlist #1           ║
-  ║   GET /songs          All 10,000 songs            ║
-  ║   GET /songs/:id      Single song by ID           ║
-  ║                                                   ║
-  ╚═══════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════╗
+║                                                 ║
+║        ♪ ♫  MUSIC PLAYER CHALLENGE  ♫ ♪         ║
+║                   API v1.0                      ║
+║                                                 ║
+╠═════════════════════════════════════════════════╣
+║                                                 ║
+║   ENDPOINTS                                     ║
+║   ─────────                                     ║
+║                                                 ║
+║   GET /playlists/1    Fetch playlist #1         ║
+║   GET /songs          All 10,000 songs          ║
+║   GET /songs/:id      Single song by ID         ║
+║                                                 ║
+╚═════════════════════════════════════════════════╝
 `);
 });
 

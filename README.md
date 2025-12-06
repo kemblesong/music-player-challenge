@@ -38,8 +38,8 @@ pnpm dev
 ```
 
 The hosted API provides the same endpoints:
-- `GET https://music-player-challenge-api.vercel.app/api/playlists/1`
-- `GET https://music-player-challenge-api.vercel.app/api/songs`
+- `GET https://music-player-challenge-api.vercel.app/playlists/1`
+- `GET https://music-player-challenge-api.vercel.app/songs`
 
 ---
 
