@@ -11,9 +11,8 @@ You'll need **two terminal windows** to run this project.
 ### Terminal 1: Start the API server
 
 ```bash
-cd api
 pnpm install
-pnpm dev
+pnpm --filter api dev
 ```
 
 The API will run at `http://localhost:3001`
@@ -21,11 +20,26 @@ The API will run at `http://localhost:3001`
 ### Terminal 2: Start the frontend
 
 ```bash
-pnpm install
 pnpm dev
 ```
 
 The frontend will run at `http://localhost:5173`
+
+### Alternative: Use the Hosted API
+
+If you prefer not to run the API locally, you can use the hosted API instead:
+
+1. Update your API base URL to: `https://music-player-challenge-api.vercel.app`
+2. Run only the frontend:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+The hosted API provides the same endpoints:
+- `GET https://music-player-challenge-api.vercel.app/api/playlists/1`
+- `GET https://music-player-challenge-api.vercel.app/api/songs`
 
 ---
 
@@ -191,7 +205,7 @@ const endIndex = Math.min(
 
 ## TypeScript Types
 
-Types are provided in `src/types/index.ts`:
+Types are provided in `app/src/types/index.ts`:
 
 ```typescript
 export interface Song {
@@ -214,17 +228,29 @@ export interface Playlist {
 
 ## Project Structure
 
+This project uses pnpm workspaces with three packages:
+
 ```
+├── app/                    # Frontend application (start here!)
+│   ├── src/
+│   │   ├── types/index.ts  # TypeScript types (provided)
+│   │   ├── App.tsx         # Start here!
+│   │   ├── main.tsx
+│   │   └── index.css
+│   ├── index.html
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
+│   └── postcss.config.js
 ├── api/                    # API server (already complete)
 │   ├── server.ts
 │   └── data/
 │       ├── playlist.json   # 20 songs for Part 1
 │       └── songs-10000.json # 10,000 songs for Part 2
-├── src/
-│   ├── types/index.ts      # TypeScript types (provided)
-│   ├── App.tsx             # Start here!
-│   ├── main.tsx
-│   └── index.css
+├── solution/               # Reference solution
+├── package.json            # Workspace root
+├── pnpm-workspace.yaml     # Workspace configuration
 └── README.md               # This file
 ```
 

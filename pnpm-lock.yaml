@@ -6,7 +6,28 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  api:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.13.7
+        version: 1.19.6(hono@4.10.7)
+      hono:
+        specifier: ^4.6.14
+        version: 4.10.7
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.1
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.3
+
+  app:
     dependencies:
       react:
         specifier: ^19.0.0
@@ -57,25 +78,6 @@ importers:
       vite:
         specifier: ^6.0.5
         version: 6.4.1(@types/node@22.19.1)(jiti@1.21.7)(tsx@4.21.0)
-
-  api:
-    dependencies:
-      '@hono/node-server':
-        specifier: ^1.13.7
-        version: 1.19.6(hono@4.10.7)
-      hono:
-        specifier: ^4.6.14
-        version: 4.10.7
-    devDependencies:
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.19.1
-      tsx:
-        specifier: ^4.19.2
-        version: 4.21.0
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.3
 
   solution:
     dependencies:
