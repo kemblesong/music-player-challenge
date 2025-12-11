@@ -35,16 +35,16 @@ app.get("/", async (c) => {
 ║   ENDPOINTS                                     ║
 ║   ─────────                                     ║
 ║                                                 ║
-║   GET /playlists/1    Fetch playlist #1         ║
-║   GET /songs          All 10,000 songs          ║
-║   GET /songs/:id      Single song by ID         ║
+║   GET /api/playlists/1    Fetch playlist #1         ║
+║   GET /api/songs          All 10,000 songs          ║
+║   GET /api/songs/:id      Single song by ID         ║
 ║                                                 ║
 ╚═════════════════════════════════════════════════╝
 `);
 });
 
 // GET /playlists/:id - Returns a playlist with its songs
-app.get("/playlists/:id", async (c) => {
+app.get("/api/playlists/:id", async (c) => {
   await delay(300);
 
   const id = c.req.param("id");
@@ -57,13 +57,13 @@ app.get("/playlists/:id", async (c) => {
 });
 
 // GET /songs - Returns all 10,000 songs (for Part 2: Virtual Scrolling)
-app.get("/songs", async (c) => {
+app.get("/api/songs", async (c) => {
   await delay(300);
   return c.json(allSongs);
 });
 
 // GET /songs/:id - Returns a single song
-app.get("/songs/:id", async (c) => {
+app.get("/api/songs/:id", async (c) => {
   await delay(100);
 
   const id = c.req.param("id");
@@ -79,9 +79,9 @@ app.get("/songs/:id", async (c) => {
 const port = 3001;
 console.log(`🎵 Music Player API running at http://localhost:${port}`);
 console.log(`\nEndpoints:`);
-console.log(`  GET /playlists/1  - Playlist with 20 songs`);
-console.log(`  GET /songs        - All 10,000 songs (sorted A-Z)`);
-console.log(`  GET /songs/:id    - Single song by ID`);
+console.log(`  GET /api/playlists/1  - Playlist with 20 songs`);
+console.log(`  GET /api/songs        - All 10,000 songs (sorted A-Z)`);
+console.log(`  GET /api/songs/:id    - Single song by ID`);
 
 serve({
   fetch: app.fetch,

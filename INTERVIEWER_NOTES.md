@@ -1,6 +1,6 @@
 # Interviewer Notes
 
-This document outlines how to evaluate candidate solutions, what an ideal implementation looks like, and specific signals to watch for during the interview. Because the project is large, make it clear to the candidate that they are not expected to cover everything in detail. Instead, once the core requirements are met, ask them to choose 2 or 3 areas to pay extra attention to (for example, accessibility and styling, or component structure and state management). For areas they don't dive into, encourage them to briefly describe what their "ideal" approach would be, to demonstrate their broader understanding.
+This document outlines how to evaluate candidate solutions for the debug-build hybrid challenge. The challenge tests both code comprehension (debugging) and feature implementation (building).
 
 ## Suggested Discussion Guide
 
@@ -11,22 +11,242 @@ Use this as a rough guide for pacing the interview:
 - Let them know they can look up APIs/documentation as needed
 - Explain they should ask questions if anything is unclear
 - Mention hints are provided in the README and can be used directly
+- Clarify that starter code is provided with bugs to fix
 
-### During Coding (~80 mins)
-- Let the candidate work independently, but stay available for questions
-- If they get stuck, offer gentle nudges before revealing hints
+### During Coding (~50 mins)
+- **Part 1 (Debug):** ~35 mins - Let them work independently, observe their debugging process
+- **Part 2 (Build):** ~20 mins - Watch how they implement Play Next feature
+- Stay available for questions but let them work through problems
 - Note their debugging approach and how they handle obstacles
 - Observe how they break down problems and manage their time
 
 ### Code Review & Discussion (5 mins)
-- Ask them to walk through their implementation choices
-- Discuss trade-offs they considered
-- Ask about areas they'd improve given more time
+- Ask them to walk through each bug they found and how they fixed it
+- Discuss their debugging process - how did they identify the bugs?
+- Ask about their Play Next implementation choices
 - Use the discussion questions below to probe deeper understanding
 
 ### Wrap Up (5 mins)
 - Answer any questions they have about the role or team
 - Explain next steps in the process
+
+## Debugging Signals
+
+This section covers what to look for when candidates are debugging the starter code.
+
+### Bug Identification Process
+
+**Strong signals:**
+- Uses browser DevTools to inspect React warnings/errors
+- Systematically tests each feature to reproduce bugs
+- Reads through code methodically to understand structure
+- Uses console.log or breakpoints strategically
+- Tests edge cases (first song, last song, empty queue)
+- Identifies root cause, not just symptoms
+
+**Weak signals:**
+- Randomly changes code hoping something works
+- Doesn't read error messages or warnings
+- Fixes symptoms without understanding the problem
+- Doesn't test after making changes
+- Gets stuck on one bug for too long without asking for help
+
+### Testing Approach
+
+**Strong signals:**
+- Tests each fix individually before moving to next bug
+- Verifies fixes work with both playlist and library
+- Tests edge cases after fixing
+- Checks that fixes don't break other functionality
+
+**Red flags:**
+- Doesn't test fixes at all
+- Only tests happy path
+- Introduces new bugs while fixing old ones
+- Doesn't verify fixes work with shuffle enabled
+
+## Bug Solutions
+
+This section documents the 3 bugs in the starter code, their locations, and expected fixes.
+
+### Bug #1: Off-by-One Error in Queue Population
+
+**Location:** `app/src/hooks/useQueue.ts` - `playSong` function
+
+**The Bug:**
+```typescript
+const newQueue = sourceSongs.slice(clickedIndex)
+```
+
+**Why it's wrong:**
+- Includes the clicked song in the queue
+- Should only include songs that come AFTER the clicked song
+- Example: Clicking song C in [A, B, C, D, E] should give queue [D, E], not [C, D, E]
+
+**Expected Fix:**
+```typescript
+const newQueue = sourceSongs.slice(clickedIndex + 1)
+```
+
+**What it tests:**
+- Array manipulation understanding
+- Attention to requirements (queue = songs AFTER current)
+- Off-by-one error recognition (common programming mistake)
+
+**Strong signals:**
+- Identifies bug quickly by testing with a small playlist
+- Understands array slicing semantics
+- Fixes correctly on first try
+
+**Red flags:**
+- Doesn't notice the bug until testing
+- Fixes with wrong approach (e.g., filtering by ID)
+- Doesn't understand why +1 is needed
+
+### Bug #2: State Mutation + Shuffle Includes Current Song
+
+**Location:** `app/src/hooks/useQueue.ts` - `toggleShuffle` function
+
+**The Bug:**
+```typescript
+const toggleShuffle = useCallback(() => {
+  if (!isShuffled) {
+    const allSongs = [currentSong, ...queue]
+    allSongs.sort(() => Math.random() - 0.5)  // Mutates array
+    setQueue(allSongs)  // Includes currentSong in queue
+    setIsShuffled(true)
+  } else {
+    setIsShuffled(false)  // Can't restore original order
+  }
+}, [currentSong, queue, isShuffled])
+```
+
+**Why it's wrong:**
+1. **State mutation:** `sort()` mutates the array directly, causing React warnings
+2. **Includes current song:** Shuffles currentSong into queue (should only shuffle queue)
+3. **Can't restore:** No `originalQueue` saved, so disabling shuffle doesn't work
+
+**Expected Fix:**
+```typescript
+const [originalQueue, setOriginalQueue] = useState<Song[]>([])
+
+const toggleShuffle = useCallback(() => {
+  if (!isShuffled) {
+    // Save original order before first shuffle
+    setOriginalQueue(queue)
+    // Only shuffle the queue, not currentSong
+    setQueue(shuffle(queue))  // Use immutable shuffle function
+    setIsShuffled(true)
+  } else {
+    // Restore original order
+    setQueue(originalQueue)
+    setIsShuffled(false)
+  }
+}, [queue, isShuffled, originalQueue])
+```
+
+**What it tests:**
+- React immutability principles
+- Understanding of state management
+- Business logic comprehension (shuffle should only affect queue)
+- Ability to fix multiple related issues
+
+**Strong signals:**
+- Notices React warning about state mutation
+- Understands that shuffle should exclude current song
+- Saves originalQueue before shuffling
+- Uses provided shuffle utility function
+
+**Red flags:**
+- Doesn't notice React warnings
+- Shuffles current song into queue
+- Doesn't preserve original order
+- Mutates state directly
+
+### Bug #3: Missing Buffer in Virtual Scroll Calculation
+
+**Location:** `app/src/hooks/useVirtualScroll.ts` - `endIndex` calculation
+
+**The Bug:**
+```typescript
+const endIndex = Math.min(
+  totalItems - 1,
+  startIndex + visibleCount
+  // Missing: + bufferCount
+)
+```
+
+**Why it's wrong:**
+- Doesn't account for buffer when calculating endIndex
+- Causes items to disappear when scrolling fast
+- No buffer below viewport means flickering during scroll
+- Buffer is needed to render items slightly outside viewport for smooth scrolling
+
+**Expected Fix:**
+```typescript
+const endIndex = Math.min(
+  totalItems - 1,
+  startIndex + visibleCount + bufferCount
+)
+```
+
+**What it tests:**
+- Performance optimization understanding
+- Virtual scrolling algorithm comprehension
+- Math/calculation skills
+- Understanding of why buffers are needed in virtual scrolling
+
+**Strong signals:**
+- Notices flickering/disappearing items when scrolling
+- Understands virtual scrolling concept
+- Recognizes buffer is needed for smooth scrolling
+- Checks the startIndex calculation (which correctly uses buffer) and applies same logic to endIndex
+
+**Red flags:**
+- Doesn't notice the performance issue
+- Doesn't understand why buffer is needed
+- Changes wrong part of the calculation
+- Breaks virtual scrolling entirely
+
+## Part 2: Play Next Feature Implementation
+
+### Expected Implementation
+
+**What to look for:**
+- Adds "Play Next" button to `SongRow` component
+- Button appears in both Playlist and Library views
+- Inserts song at front of queue: `setQueue((q) => [song, ...q])` or `setQueue([song, ...queue])`
+- Works correctly with shuffle enabled
+- Provides visual feedback (button styling, hover states)
+
+**Strong signals:**
+- Uses functional update for queue state
+- Adds button to SongRow component (reusable)
+- Handles edge cases (empty queue, duplicate songs)
+- Maintains correct behavior with shuffle
+- Clean UI integration
+
+**Red flags:**
+- Inserts at wrong position (end instead of front)
+- Doesn't work with shuffle enabled
+- Breaks existing functionality
+- Poor UI/UX (no visual feedback, hard to click)
+
+### Optional: Grouping Features
+
+If candidate implements grouping features, look for:
+
+**Alphabetical Jump:**
+- Builds index map efficiently (single pass)
+- Uses `scrollToIndex` from virtual scroll hook
+- Disables letters with no matching songs
+- Works correctly with virtual scrolling
+
+**Group by Album/Artist:**
+- Flattens groups into single list for virtual scrolling
+- Headers and songs have consistent height
+- Maintains correct play queue (only songs, not headers)
+- Sorts groups alphabetically
 
 ## Ideal State Structure
 
@@ -34,383 +254,162 @@ A well-structured solution should maintain these key state variables:
 
 - `currentSong: Song | null` - Currently playing song
 - `queue: Song[]` - Upcoming songs in the queue
-- `originalQueue: Song[]` - Preserved original queue order for un-shuffle functionality
+- `originalQueue: Song[]` - Preserved original queue order for un-shuffle functionality (added during Bug #2 fix)
 - `isShuffled: boolean` - Toggle state for shuffle mode
-- `playlist: Song[]` - Source playlist data
-
-## Data Structure Signals by Task
-
-### Task 2 (Play Song & Populate Queue)
-
-**What to look for:** Candidates who understand array slicing. When clicking song C in `[A, B, C, D, E]`, they should use `playlist.slice(clickedIndex + 1)` to get `[D, E]`.
-
-**Strong signal:** Uses `findIndex` or tracks index, then slices correctly.
-
-**Weak signal:** Filters by comparing IDs or uses inefficient search.
-
-### Task 3 (Play Next)
-
-**What to look for:** Inserting at the front of the queue. Ideal: `[newSong, ...queue]` or `queue.unshift(newSong)`.
-
-**Note:** `unshift` is O(n) but acceptable for small lists (20 songs). For larger datasets, consider a deque or linked list, but that's over-engineering here.
-
-**Strong signal:** Understands queue semantics (FIFO) and maintains order correctly.
-
-### Task 4 (Shuffle)
-
-**What to look for:**
-- Preserves `originalQueue` before shuffling
-- Restores original order when toggle is disabled
-- Implements shuffling (the Fisher-Yates algorithm is provided in the hints)
-
-**Strong signals:**
-- Saves original queue before first shuffle
-- Handles toggle on/off cleanly
-
-**Red flags:**
-- Doesn't preserve original order (can't un-shuffle)
-- Shuffles the currently playing song
-
-## Part 2: Song Library Implementation
-
-Part 2 tests performance optimization, DOM manipulation, and handling large datasets. Tasks are listed in order of increasing difficulty.
-
-### Task 1: Fetch & Display Songs (Easy)
-
-**What to look for:** Standard data fetching with loading/error states. Most candidates should complete this quickly.
-
-**Implementation approach:**
-- Fetch 10K songs from `/api/songs`
-- Display in a scrollable list
-- Performance becomes an issue here — naive rendering will lag
-
-**Strong signals:**
-- Recognizes performance problem without prompting
-- Implements virtual scrolling or pagination
-- Proper loading/error states
-
-**Red flags:**
-- Renders all 10K items in DOM without noticing lag
-- No loading state while fetching
-
-### Task 2: Search (Easy-Medium)
-
-**What to look for:** Filtering logic with performance considerations.
-
-**Implementation approach:**
-```typescript
-const filteredSongs = useMemo(() =>
-  songs.filter(song =>
-    song.title.toLowerCase().includes(query.toLowerCase()) ||
-    song.artist.toLowerCase().includes(query.toLowerCase())
-  ),
-  [songs, query]
-)
-```
-
-**Strong signals:**
-- Uses `useMemo` to avoid re-filtering on every render
-- Debounces search input to avoid filtering on every keystroke
-- Case-insensitive matching
-
-**Red flags:**
-- Filters on every render without memoization
-- No debouncing — UI freezes while typing
-- Case-sensitive search (misses obvious matches)
-
-### Task 3: Alphabetical Jump (Medium)
-
-**What to look for:** Building an index map and programmatic scrolling.
-
-**Implementation approach:**
-```typescript
-// Build index map
-const letterIndexMap = useMemo(() => {
-  const map = new Map<string, number>()
-  songs.forEach((song, index) => {
-    const letter = song.title.charAt(0).toUpperCase()
-    if (!map.has(letter)) map.set(letter, index)
-  })
-  return map
-}, [songs])
-
-// Scroll to letter
-const scrollToLetter = (letter: string) => {
-  const index = letterIndexMap.get(letter)
-  if (index !== undefined) {
-    scrollContainerRef.current.scrollTop = index * ITEM_HEIGHT
-  }
-}
-```
-
-**Strong signals:**
-- Builds index map efficiently (single pass)
-- Correctly calculates scroll position based on item height
-- Disables letters with no matching songs
-
-**Red flags:**
-- Searches entire array on each letter click (O(n) per click)
-- Doesn't account for virtual scrolling offset
-- No visual feedback for unavailable letters
-
-### Task 4: Group by Artist/Album (Hard)
-
-**What to look for:** This is significantly harder because grouping changes the data structure. With virtual scrolling, candidates must handle a mixed list of headers and songs.
-
-**Implementation approach:**
-```typescript
-type ListItem =
-  | { type: 'header'; label: string }
-  | { type: 'song'; song: Song }
-
-const listItems = useMemo((): ListItem[] => {
-  if (groupBy === 'none') {
-    return songs.map(song => ({ type: 'song', song }))
-  }
-
-  const grouped = new Map<string, Song[]>()
-  for (const song of songs) {
-    const key = groupBy === 'artist' ? song.artist : song.album
-    if (!grouped.has(key)) grouped.set(key, [])
-    grouped.get(key)!.push(song)
-  }
-
-  const items: ListItem[] = []
-  for (const [label, groupSongs] of grouped) {
-    items.push({ type: 'header', label })
-    groupSongs.forEach(song => items.push({ type: 'song', song }))
-  }
-  return items
-}, [songs, groupBy])
-```
-
-**Strong signals:**
-- Flattens groups into a single list for virtual scrolling
-- Headers and songs have consistent height (or variable height handling)
-- Maintains correct play queue (extracts only songs, not headers)
-- Considers interaction with alphabetical jump (disables or adapts)
-
-**Red flags:**
-- Breaks virtual scrolling when grouping is enabled
-- Headers don't scroll correctly with content
-- Play queue includes header items
-- Doesn't sort groups alphabetically
-
-### Task Difficulty Summary
-
-| Task | Difficulty | Time Estimate | Notes |
-|------|------------|---------------|-------|
-| Task 1: Fetch & Display | Easy | 10-15 min | Standard pattern, performance awareness key |
-| Task 2: Search | Easy-Medium | 8-12 min | Debouncing + memoization |
-| Task 3: Alphabetical Jump | Medium | 10-15 min | Index building + scroll calculation |
-| Task 4: Group by Artist/Album | Hard | 15-20 min | Consider making optional |
-
-**Recommendation:** Tasks 1-3 are required (~30-40 min). Task 4 can be offered as a bonus for candidates who finish early.
-
-## Virtual Scrolling Implementation
-
-Virtual scrolling (used in Task 1) tests understanding of performance optimization and DOM manipulation.
-
-### Key Formula
-
-```typescript
-const startIndex = Math.floor(scrollTop / itemHeight)
-const endIndex = Math.min(
-  startIndex + Math.ceil(containerHeight / itemHeight) + buffer,
-  totalItems - 1
-)
-const visibleItems = items.slice(startIndex, endIndex)
-```
-
-### Implementation Patterns
-
-1. **Outer container:** Fixed height with `overflow-y: auto`
-2. **Inner container:** Height set to `totalItems * itemHeight` (creates correct scrollbar)
-3. **Visible items container:** Positioned using `transform: translateY(startIndex * itemHeight)` or `paddingTop`
-4. **Buffer:** Render 1-3 extra items above/below viewport to prevent flicker during fast scrolling
-
-### Strong Signals
-
-- Understands why rendering 10K DOM nodes is problematic
-- Correctly calculates total height for scrollbar
-- Uses transform/positioning to offset visible items
-- Implements buffer for smooth scrolling
-- Handles edge cases (scrolling to top/bottom)
-
-### Red Flags
-
-- Renders all 10,000 items in the DOM
-- Scrollbar height doesn't match total items
-- Items jump or flicker during scroll
-- Doesn't handle scroll position restoration
 
 ## React Patterns
-
-The challenge tests React fundamentals: hooks usage, component composition, and performance optimization.
 
 ### Hooks Usage
 
 **useEffect:**
-- **Strong signal:** Proper dependency arrays, cleanup functions for event listeners or timers
-- **Red flag:** Missing dependencies causing stale closures, infinite loops, no cleanup
+- **Strong signal:** Proper dependency arrays, cleanup functions
+- **Red flag:** Missing dependencies causing stale closures, infinite loops
 
 **useState:**
 - **Strong signal:** Functional updates for state derived from previous state (`setQueue(q => [...q, newSong])`)
-- **Red flag:** Direct mutation, stale closure issues, not using functional updates when needed
+- **Red flag:** Direct mutation, stale closure issues
 
-**useMemo/useCallback:**
-- **Strong signal:** Uses `useCallback` for scroll handlers (throttling/debouncing), `useMemo` for expensive calculations
-- **Red flag:** Premature optimization everywhere OR missing optimization for virtual scroll performance
+**useCallback:**
+- **Strong signal:** Uses `useCallback` for event handlers, proper dependencies
+- **Red flag:** Missing dependencies causing stale closures
 
 **Custom Hooks:**
-- **Strong signal:** Extracts reusable logic into `usePlaylist`, `useVirtualScroll`, `useQueue` hooks
-- **Red flag:** All logic crammed in one component, no separation of concerns
+- **Strong signal:** Understands existing hooks structure, adds to it cleanly
+- **Red flag:** Duplicates logic instead of reusing hooks
 
 ### Component Patterns
 
 **Component Extraction:**
-- **Strong signal:** Separates `SongRow` component for list items, uses `React.memo` for performance (critical for virtual scroll)
-- **Red flag:** Everything in one monolithic component, no component reuse
+- **Strong signal:** Adds Play Next button to existing `SongRow` component
+- **Red flag:** Creates duplicate components or breaks existing structure
 
 **List Keys:**
 - **Strong signal:** Uses stable keys (song IDs), never array indices
-- **Red flag:** Uses array index as key in virtual scroll (causes flicker/bugs when items shift)
+- **Red flag:** Uses array index as key (causes flicker/bugs)
 
 **Component Composition:**
-- **Strong signal:** Appropriate component separation (`NowPlaying`, `Queue`, `SongList`), uses context or props for shared state
-- **Red flag:** Prop drilling 5+ levels deep without extracting context or using composition
+- **Strong signal:** Works with existing component structure
+- **Red flag:** Breaks existing component hierarchy
 
-## Styling Signals
+## Virtual Scrolling Implementation
 
-The project is set up with Tailwind CSS, but candidates are not expected to use Tailwind. They may use CSS modules, plain CSS, styled-components, or any other styling approach they're comfortable with. Look for proper layout patterns, accessibility, and virtual scroll CSS implementation regardless of the styling method chosen.
+Virtual scrolling is already implemented but has a bug. Candidates should understand:
 
-### Layout Patterns
+### Key Formula
 
-**Scrollable Containers:**
-- **Strong signal:** Uses `overflow-y: auto` (or Tailwind's `overflow-y-auto`) with fixed or calculated height for scrollable lists
-- **Red flag:** Missing overflow, content overflows viewport, scroll doesn't work
+```typescript
+const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - bufferCount)
+const endIndex = Math.min(
+  totalItems - 1,
+  startIndex + visibleCount + bufferCount  // Buffer needed here!
+)
+```
 
-**List Layout:**
-- **Strong signal:** Uses flexbox with column direction and consistent spacing for song lists
-- **Red flag:** Inconsistent spacing, manual margins, layout breaks on different screen sizes
+### Why Buffer is Needed
 
-**Now Playing Section:**
-- **Strong signal:** Uses sticky or fixed positioning, clear visual hierarchy with proper spacing
-- **Red flag:** Now playing section scrolls away, gets lost in the UI, poor visual separation
+- Renders items slightly outside viewport
+- Prevents flickering during fast scrolling
+- Smooths the scrolling experience
+- Both startIndex and endIndex need buffer
 
-### Virtual Scroll CSS
+### Strong Signals
 
-**Positioning:**
-- **Strong signal:** Uses `transform: translateY()` or `style={{ top: ... }}` for positioning visible items
-- **Red flag:** Uses `margin-top` on inner container (causes scroll jump issues)
+- Understands why rendering 10K DOM nodes is problematic
+- Recognizes buffer is needed for smooth scrolling
+- Correctly applies buffer to endIndex calculation
+- Tests scrolling performance after fix
 
-**Container Heights:**
-- **Strong signal:** Sets explicit container height (e.g., `height: 600px` or calculated value) for correct scrollbar behavior
-- **Red flag:** Missing height, scrollbar doesn't match content height
+### Red Flags
 
-### Accessibility & UX
-
-**Interactive Elements:**
-- **Strong signal:** Visible focus states, hover states, and cursor changes on interactive elements
-- **Red flag:** No visual feedback on click/hover, can't tell what's clickable, poor keyboard navigation
-
-**Text Handling:**
-- **Strong signal:** Truncates long text with `text-overflow: ellipsis` and `overflow: hidden`, maintains layout integrity
-- **Red flag:** Text breaks layout, no truncation for long song titles/artists
-
-## Green Flags (Strong Signals)
-
-| Area | Signal |
-|------|--------|
-| **State Management** | Keeps `originalQueue` separate for un-shuffle functionality |
-| **Immutability** | Uses spread operator (`[...array]`) or `slice()`, never mutates state directly |
-| **Edge Cases** | Handles empty queue, single song, last song, rapid clicks gracefully |
-| **Component Design** | Separates concerns: `NowPlaying`, `Queue`, `SongList` components |
-| **React Hooks** | Proper `useEffect` dependencies, functional `useState` updates, `useCallback` for scroll handlers |
-| **React Performance** | Uses `React.memo` for list items, stable keys (IDs not indices), extracts custom hooks |
-| **TypeScript** | Properly types state, event handlers, and function parameters |
-| **Virtual Scroll** | Understands why DOM node count matters for performance |
-| **Styling** | Proper CSS layout (scrollable containers, flexbox), uses `transform` for virtual scroll positioning |
-| **Accessibility** | Visible focus states, hover feedback, cursor changes, text truncation |
-| **Error Handling** | Shows loading states, handles API errors, provides user feedback |
-| **Code Organization** | Logical file structure, reusable functions, clear naming |
-
-## Red Flags (Concerns)
-
-| Area | Signal |
-|------|--------|
-| **State Mutations** | Mutates arrays with `.push()`, `.splice()`, `.pop()` directly on state |
-| **Shuffle Logic** | Shuffles the currently playing song |
-| **Shuffle Logic** | Doesn't preserve original order (can't un-shuffle) |
-| **React Hooks** | Missing `useEffect` dependencies, infinite loops, no cleanup functions, stale closures |
-| **React Keys** | Uses array indices as keys in virtual scroll (causes flicker/bugs) |
-| **React Performance** | No `React.memo` for list items, re-renders entire list on scroll, no `useCallback` for handlers |
-| **Virtual Scroll** | Renders all 10K items instead of only visible ones |
-| **Virtual Scroll** | Wrong height calculation (scrollbar doesn't match content) |
-| **Virtual Scroll CSS** | Uses `margin-top` for positioning (causes scroll jumps), missing container height |
-| **Styling** | Missing overflow handling, no hover/focus states, text breaks layout, no truncation |
-| **Error Handling** | No loading states, silent failures, unhandled promise rejections |
-| **Type Safety** | Uses `any` types, missing type annotations, ignores TypeScript errors |
-| **Queue Logic** | Incorrect queue population (includes current song or wrong slice) |
-| **Play Next** | Inserts at wrong position (end instead of front) |
+- Doesn't understand why virtual scrolling is needed
+- Breaks virtual scrolling entirely
+- Doesn't test scrolling after fix
+- Doesn't recognize the performance issue
 
 ## Time Expectations
 
-### Part 1: Core Music Player
+### Part 1: Debug the Player (~35 mins)
+
+| Bug | Expected Time | Notes |
+|-----|---------------|-------|
+| Bug #1 (Off-by-one) | 8-10 min | Should be quick - test with small playlist |
+| Bug #2 (Shuffle) | 12-15 min | More complex - multiple issues, requires understanding state |
+| Bug #3 (Virtual scroll) | 10-12 min | Requires understanding virtual scrolling algorithm |
+| Testing & verification | 5-8 min | Test all fixes together |
+
+**Part 1 Total:** ~35 minutes
+
+### Part 2: Add Features (~20 mins)
 
 | Task | Expected Time | Notes |
 |------|---------------|-------|
-| Task 1 (Fetch/Display) | 8-10 min | Basic React setup, API call, loading/error states |
-| Task 2 (Play/Queue) | 12-15 min | Core logic, state management, UI updates |
-| Task 3 (Play Next) | 5-7 min | Queue manipulation, UI action (button/menu) |
-| Task 4 (Shuffle) | 10-12 min | Algorithm implementation, toggle logic, state preservation |
-| Task 5 (Additional) | 5-8 min | Pick 1-2 features from the list (optional if time is tight) |
+| Play Next implementation | 15-18 min | Add button, implement logic, test |
+| Optional grouping | 10-15 min | If time permits |
 
-**Part 1 Total:** ~40-52 minutes
+**Part 2 Total:** ~20 minutes
 
-### Part 2: Song Library
-
-| Task | Expected Time | Notes |
-|------|---------------|-------|
-| Task 1 (Fetch/Display) | 10-15 min | Performance awareness is key — should recognize need for optimization |
-| Task 2 (Search) | 8-12 min | Debouncing + memoization |
-| Task 3 (Alphabetical Jump) | 10-15 min | Index building + scroll calculation |
-| Task 4 (Group by Artist/Album) | 15-20 min | Hard — consider making optional/bonus |
-
-**Part 2 Total:** ~35-50 minutes (Tasks 1-3 required, Task 4 optional)
-
-**Combined Total:** ~75-100 minutes
+**Combined Total:** ~55 minutes (5 min buffer)
 
 ## Discussion Questions
 
 Use these questions to probe deeper understanding:
 
-1. **"What happens if the user clicks Play Next on the currently playing song?"**
-   - *Look for:* Edge case handling, whether they prevent duplicates or handle gracefully
+1. **"Walk me through how you identified each bug. What was your debugging process?"**
+   - *Look for:* Systematic approach, use of tools, testing strategy
 
-2. **"How would you handle very long song titles in the UI?"**
-   - *Look for:* CSS truncation, ellipsis, responsive design thinking
+2. **"Why did you need to save `originalQueue` for the shuffle feature?"**
+   - *Look for:* Understanding of state management, requirement comprehension
 
-3. **"If we had 1M songs instead of 10K, would your virtual scroll approach still work?"**
-   - *Look for:* Understanding of browser limits, potential need for pagination or windowing
+3. **"What would happen if we removed the buffer from virtual scrolling entirely?"**
+   - *Look for:* Understanding of performance optimization, virtual scrolling mechanics
 
-4. **"How would you add drag-to-reorder for the queue?"**
-   - *Look for:* Knowledge of drag-and-drop APIs, state management for reordering
+4. **"How would you handle a duplicate song being added via Play Next?"**
+   - *Look for:* Edge case thinking, user experience consideration
 
-5. **"What data structure would you use if the queue could have 100K songs?"**
-   - *Look for:* Understanding of performance trade-offs, consideration of linked lists vs arrays
+5. **"If we had 1M songs instead of 10K, would your virtual scroll fix still work?"**
+   - *Look for:* Understanding of scalability, algorithm complexity
 
-6. **"How would you persist the queue state if the user refreshes the page?"**
-   - *Look for:* Knowledge of localStorage, sessionStorage, or other persistence strategies
+6. **"How would you add unit tests for the queue management logic?"**
+   - *Look for:* Testing knowledge, understanding of testable code
 
-7. **"How would you prevent unnecessary re-renders when scrolling through 10K items?"**
-   - *Look for:* Understanding of `React.memo`, stable callbacks with `useCallback`, throttling scroll events, memoization strategies
+7. **"What would you do differently if you were building this from scratch?"**
+   - *Look for:* Architectural thinking, understanding of trade-offs
+
+## Green Flags (Strong Signals)
+
+| Area | Signal |
+|------|--------|
+| **Debugging** | Systematic approach, uses DevTools, tests fixes |
+| **Bug Fixes** | Correct fixes, doesn't introduce new bugs |
+| **State Management** | Keeps `originalQueue` separate for un-shuffle functionality |
+| **Immutability** | Uses spread operator (`[...array]`) or `slice()`, never mutates state directly |
+| **Edge Cases** | Handles empty queue, single song, last song gracefully |
+| **React Hooks** | Proper `useEffect` dependencies, functional `useState` updates |
+| **React Performance** | Understands virtual scrolling, uses `React.memo` appropriately |
+| **TypeScript** | Properly types new code, maintains existing types |
+| **Code Quality** | Clean, readable, well-organized code |
+| **Testing** | Tests fixes thoroughly, verifies edge cases |
+| **Feature Implementation** | Play Next works correctly, good UI/UX |
+
+## Red Flags (Concerns)
+
+| Area | Signal |
+|------|--------|
+| **Debugging** | Random changes, doesn't read errors, doesn't test |
+| **State Mutations** | Mutates arrays with `.push()`, `.splice()`, `.sort()` directly on state |
+| **Shuffle Logic** | Shuffles the currently playing song, doesn't preserve original order |
+| **React Hooks** | Missing `useEffect` dependencies, infinite loops, stale closures |
+| **Virtual Scroll** | Doesn't understand buffer concept, breaks virtual scrolling |
+| **Queue Logic** | Incorrect queue population (includes current song or wrong slice) |
+| **Play Next** | Inserts at wrong position (end instead of front) |
+| **Code Quality** | Messy code, breaks existing structure, poor naming |
+| **Testing** | Doesn't test fixes, only tests happy path |
 
 ## Evaluation Rubric
 
 | Level | Description |
 |-------|-------------|
-| **Excellent** | Completes all Part 1 and Part 2 tasks correctly, handles edge cases, clean code structure, implements virtual scrolling properly |
-| **Good** | Completes Part 1 tasks (1-4) and Part 2, minor issues with shuffle or edge cases, readable code |
-| **Satisfactory** | Completes basic Part 1 functionality (1-2) and attempts Part 2, some bugs or missing edge cases, works but messy |
-| **Needs Work** | Struggles with state management, incorrect queue logic, doesn't complete core features or Part 2 |
+| **Excellent** | Fixes all 3 bugs correctly, implements Play Next feature, handles edge cases, clean code, tests thoroughly |
+| **Good** | Fixes all 3 bugs correctly, implements Play Next, minor issues or missing edge cases, readable code |
+| **Satisfactory** | Fixes 2-3 bugs (may have issues), implements Play Next with some problems, works but messy |
+| **Needs Work** | Struggles to identify bugs, incorrect fixes, doesn't complete Play Next feature, introduces new bugs |

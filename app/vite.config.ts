@@ -6,10 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/': {
-        target: 'http://localhost:3001',
+      '/api': {
+        target: process.env.VITE_API_TARGET || 'https://music-player-challenge-api.vercel.app',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
