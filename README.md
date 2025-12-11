@@ -1,43 +1,51 @@
 # Music Player Challenge
 
-Debug and enhance a music player application similar to Spotify. This challenge tests your ability to read and understand existing code, identify and fix bugs, and add new features.
+Build a music player application similar to Spotify. This challenge tests your ability to work with data structures, manage application state, and build intuitive user interfaces.
 
-**Time Limit:** 1 hour
+**Time Limit:** 1.5 hours
+
+<img width="1564" height="1084" alt="image" src="https://github.com/user-attachments/assets/9e02dfad-a4ef-44ca-9a9c-11c48ac5e517" />
 
 ## Getting Started
 
-The challenge uses a hosted API, so you only need to run the frontend:
+You'll need **two terminal windows** to run this project.
+
+### Terminal 1: Start the API server
+
+```bash
+pnpm install
+pnpm --filter api dev
+```
+
+The API will run at `http://localhost:3001`
+
+### Terminal 2: Start the frontend
+
+```bash
+pnpm dev
+```
+
+The frontend will run at `http://localhost:5173`
+
+### Alternative: Use the Hosted API
+
+If you prefer not to run the API locally, you can use the hosted API instead:
+
+1. Update your API base URL to: `https://music-player-challenge-api.vercel.app`
+2. Run only the frontend:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-The frontend will run at `http://localhost:5173`
-
-The API endpoints are automatically proxied to the hosted API:
-- `GET https://music-player-challenge-api.vercel.app/api/playlists/1`
-- `GET https://music-player-challenge-api.vercel.app/api/songs`
-
-### Using Local API (Optional)
-
-If you prefer to run the API server locally, you can use:
-
-```bash
-# Terminal 1: Start the API server
-pnpm --filter api dev
-
-# Terminal 2: Start the frontend with local API
-pnpm dev:local
-```
-
-This will proxy API requests to `http://localhost:3001` instead of the hosted API.
+The hosted API provides the same endpoints:
+- `GET https://music-player-challenge-api.vercel.app/playlists/1`
+- `GET https://music-player-challenge-api.vercel.app/songs`
 
 ---
 
 ## API Endpoints
-
-The frontend uses relative paths (`/api/playlists/1`, `/api/songs`) which are automatically proxied to the hosted API.
 
 ### `GET /api/playlists/1`
 
@@ -62,64 +70,102 @@ interface Song {
 
 ### `GET /api/songs`
 
-Returns all 10,000 songs sorted A-Z by title.
+Returns all 10,000 songs sorted A-Z by title. Used for Part 2.
 
 ---
 
-## Part 1: Debug the Player (~35 mins)
+## Part 1: Core Music Player (~40 mins)
 
-The music player has been partially implemented, but it contains **3 bugs** that prevent it from working correctly. Your task is to identify and fix all of them.
+Build a music player with the following features:
 
-### Bug Symptoms
+### Task 1: Fetch & Display Playlist
 
-1. **Queue includes current song**: When you click on a song to play it, the queue includes the song you just clicked. The queue should only contain songs that come **after** the selected song.
+- Fetch the playlist from `/api/playlists/1`
+- Display all songs with album art, title, artist, and duration
+- Show a loading state while fetching
+- Handle errors gracefully
 
-2. **Shuffle has issues**: When you enable shuffle, you may notice:
-   - React warnings about state mutation
-   - The currently playing song appears in the shuffled queue (it shouldn't)
-   - Disabling shuffle doesn't restore the original order
+### Task 2: Play a Song & Populate Queue
 
-3. **Virtual scrolling glitches**: When scrolling through the 10K song library, items may disappear or flicker, especially when scrolling quickly. The scrollbar may also not match the actual content height.
+- When a user clicks on a song, it becomes the "now playing" song
+- All songs **after** the selected song should populate the queue
+- Display the current song prominently (album art, title, artist)
+- Show the queue of upcoming songs
+- NOTE: we're not actually streaming any audio in this exercise!
 
-### Your Task
+**Example:** If the playlist has songs [A, B, C, D, E] and the user clicks on C:
+- Now playing: C
+- Queue: [D, E]
 
-- Identify where each bug is located in the codebase
-- Fix all 3 bugs
-- Test your fixes to ensure everything works correctly
-- The player should work smoothly with both the 20-song playlist and the 10K song library
+### Task 3: Play Next
 
-**Hints:**
-- Use browser DevTools to inspect React warnings
-- Test edge cases (first song, last song, empty queue)
-- Pay attention to array slicing and state immutability
-- Check virtual scroll calculations for buffer handling
+- Add a "Play Next" action to each song (button, context menu, or similar)
+- When triggered, the song is inserted at the **front** of the queue
+- After the "play next" song finishes, the normal queue resumes
+
+**Example:** If queue is [D, E] and user adds B as "Play Next":
+- Queue becomes: [B, D, E]
+
+### Task 4: Shuffle
+
+- Add a shuffle button/toggle
+- When enabled, shuffle the remaining queue (not the currently playing song)
+- When disabled, restore the original queue order
+- The shuffle should be randomized each time
+
+### Task 5: Additional Operations (Pick Any)
+
+Implement any of these features if you have time:
+
+- **Previous/Next:** Navigate through songs
+- **Remove from Queue:** Remove a song from the queue
+- **Clear Queue:** Remove all songs from the queue
+- **Repeat Mode:** Off → Repeat All → Repeat One
 
 ---
 
-## Part 2: Add Features (~20 mins)
+## Part 2: Song Library (~40 mins)
 
-Once you've fixed all the bugs, implement the following feature:
+Build an interface for browsing a large song library.
 
-### Required: Play Next Functionality
+### Task 1: Fetch & Display Songs
 
-Add a "Play Next" button to each song in both the Playlist and Library views. When clicked:
+- Fetch all 10,000 songs from `/api/songs`
+- Display them in a scrollable list sorted A-Z
+- Your solution should remain responsive with the full dataset
 
-- The song should be inserted at the **front** of the queue (before all other queued songs)
-- The button should provide clear visual feedback
-- The feature should work correctly even when shuffle is enabled
+### Task 2: Search
 
-**Example:** If the queue is `[D, E]` and the user clicks "Play Next" on song B:
-- Queue becomes: `[B, D, E]`
+- Add a search input to filter songs by title or artist
+- Results should update as the user types
 
-### Optional: Grouping Features (if time permits)
+### Task 3: Alphabetical Jump
 
-If you finish early, add one or more of these features to the song library:
+- Display an A-Z navigation (e.g., clickable letters)
+- Clicking a letter scrolls to songs starting with that letter
 
-- **Alphabetical Jump**: Display an A-Z navigation bar. Clicking a letter scrolls to songs starting with that letter.
-- **Group by Album**: Add a toggle to group songs by album with section headers.
-- **Group by Artist**: Add a toggle to group songs by artist with section headers.
+### Task 4: Group by Artist or Album
 
-**Note:** If implementing grouping, make sure virtual scrolling still works correctly with the grouped layout.
+- Add the ability to toggle grouping by artist or album
+- Display section headers for each group
+
+---
+
+## Bonus: Integrated Music Player (~20 mins)
+
+If you've completed both Part 1 and Part 2, integrate them together:
+
+- Allow users to play songs directly from the full 10,000-song library
+- When a song is clicked in the library, it becomes the "now playing" song
+- All songs **after** the selected song in the sorted list should populate the queue
+- Maintain all Part 1 functionality (play next, shuffle, queue management) with the full library
+- Consider adding search/filter functionality to help users find songs in the large library
+
+**Example:** If a user searches for "Beatles" and clicks on "Hey Jude" (which appears at position 4,523 in the sorted list):
+- Now playing: "Hey Jude"
+- Queue: All songs from position 4,524 onwards (approximately 5,477 songs)
+
+This bonus challenge tests your ability to refactor for reuse, combine multiple features, and handle edge cases with large datasets.
 
 ---
 
@@ -150,60 +196,17 @@ function shuffle<T>(array: T[]): T[] {
 }
 ```
 
-### Virtualized Scrolling
-
-```typescript
-function useVirtualScroll(itemHeight: number, totalItems: number, containerHeight: number) {
-  const [scrollTop, setScrollTop] = useState(0)
-  
-  // Calculate visible range
-  const visibleCount = Math.ceil(containerHeight / itemHeight)
-  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - 5) // buffer
-  const endIndex = Math.min(totalItems - 1, startIndex + visibleCount + 10) // buffer
-  
-  // Render only items from startIndex to endIndex
-  const visibleItems = items.slice(startIndex, endIndex + 1)
-  const offsetY = startIndex * itemHeight
-  const totalHeight = totalItems * itemHeight
-  
-  return {
-    visibleItems,
-    offsetY,
-    totalHeight,
-    onScroll: (e: React.UIEvent<HTMLDivElement>) => setScrollTop(e.currentTarget.scrollTop)
-  }
-}
-
-// Usage in component:
-// <div onScroll={onScroll} style={{ height: '600px', overflow: 'auto' }}>
-//   <div style={{ height: totalHeight, position: 'relative' }}>
-//     <div style={{ transform: `translateY(${offsetY}px)` }}>
-//       {visibleItems.map(item => <Item key={item.id} {...item} />)}
-//     </div>
-//   </div>
-// </div>
-```
-
-### Debugging Tips
-
-- **React DevTools**: Use React DevTools to inspect component state and props
-- **Console Warnings**: Pay attention to React warnings about state mutations or missing dependencies
-- **Step Through Code**: Use breakpoints to understand the flow of data
-- **Test Incrementally**: Fix one bug at a time and test before moving to the next
-- **Check Array Methods**: Verify that array operations (slice, map, filter) are used correctly
-
 ---
 
 ## Evaluation Criteria
 
 | Criteria | What We Look For |
 |----------|------------------|
-| **Bug Identification** | Can you systematically find and understand the bugs? |
-| **Fix Correctness** | Do your fixes solve the problems without introducing new issues? |
-| **Code Quality** | Clean, readable, well-organized code |
-| **State Management** | Proper handling of player/queue state, immutability |
-| **Testing** | Do you test your fixes thoroughly? |
-| **Feature Implementation** | Correct implementation of Play Next functionality |
+| **Correctness** | Features work as described |
+| **Code Quality** | Clean, readable, well-organized |
+| **State Management** | Proper handling of player/queue state |
+| **Edge Cases** | Empty queue, single song, rapid clicks |
+| **Algorithm Choice** | Appropriate data structures |
 
 ---
 
@@ -238,11 +241,9 @@ This project uses pnpm workspaces and vite:
 ├── app/                    # Frontend application (start here!)
 │   ├── src/
 │   │   ├── types/index.ts  # TypeScript types (provided)
-│   │   ├── App.tsx         # Main app component
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom hooks (contains bugs!)
-│   │   ├── context/        # React context
-│   │   └── utils/          # Utility functions
+│   │   ├── App.tsx         # Start here!
+│   │   ├── main.tsx
+│   │   └── index.css
 │   ├── index.html
 │   ├── package.json
 │   ├── tsconfig.json
@@ -252,8 +253,8 @@ This project uses pnpm workspaces and vite:
 ├── api/                    # API server (already complete)
 │   ├── server.ts
 │   └── data/
-│       ├── playlist.json   # 20 songs
-│       └── songs-10000.json # 10,000 songs
+│       ├── playlist.json   # 20 songs for Part 1
+│       └── songs-10000.json # 10,000 songs for Part 2
 ├── package.json            # Workspace root
 ├── pnpm-workspace.yaml     # Workspace configuration
 └── README.md               # This file
