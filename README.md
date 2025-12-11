@@ -8,40 +8,16 @@ Build a music player application similar to Spotify. This challenge tests your a
 
 ## Getting Started
 
-You'll need **two terminal windows** to run this project.
-
-### Terminal 1: Start the API server
+Run the starter application:
 
 ```bash
 pnpm install
-pnpm --filter api dev
-```
-
-The API will run at `http://localhost:3001`
-
-### Terminal 2: Start the frontend
-
-```bash
 pnpm dev
 ```
 
 The frontend will run at `http://localhost:5173`
 
-### Alternative: Use the Hosted API
-
-If you prefer not to run the API locally, you can use the hosted API instead:
-
-1. Update your API base URL to: `https://music-player-challenge-api.vercel.app`
-2. Run only the frontend:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-The hosted API provides the same endpoints:
-- `GET https://music-player-challenge-api.vercel.app/playlists/1`
-- `GET https://music-player-challenge-api.vercel.app/songs`
+API requests to `/api/*` are automatically proxied via Vite to the hosted API at `https://music-player-challenge-api.vercel.app`. This means you can use relative paths like `/api/playlists/1` and `/api/songs` in your code, and Vite will handle forwarding them to the hosted API.
 
 ---
 
